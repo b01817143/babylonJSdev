@@ -17,6 +17,7 @@ import {
   StandardMaterial,
   Color3,
   ShadowGenerator,
+  Texture
 } from "@babylonjs/core";
 
 function createHemisphericLight(scene: Scene ){
@@ -39,7 +40,7 @@ function createPointLight(scene: Scene ){
 }
 
 function createDirectionalLight(scene: Scene ){
-    const light = new DirectionalLight("light", new Vector3(0.2, -1, 0.2),scene);
+    const light = new DirectionalLight("light", new Vector3(-0.2, -0.5, -0.2),scene);
     light.position = new Vector3(20, 40, 20);
     light.intensity = 0.7;
     light.diffuse = new Color3(1, 0, 0);
@@ -72,12 +73,29 @@ function createPointShadows(light: PointLight, sphere: Mesh ,box: Mesh){
 }
 
 
-function getMaterial(scene: Scene){
+function createDirectionalShadows(light: DirectionalLight, sphere: Mesh ,box: Mesh){
+    const shadower = new ShadowGenerator(1024, light);
+    const sm : any = shadower.getShadowMap();
+    sm.renderList.push(sphere, box);
+
+    shadower.setDarkness(0.2);
+    shadower.useBlurExponentialShadowMap = true;
+    shadower.blurScale = 4;
+    shadower.blurBoxOffset = 1;
+    shadower.useKernelBlur = true;
+    shadower.blurKernel = 64;
+    shadower.bias = 0;
+    return shadower;
+}
+
+function getMaterial(scene: Scene) {
+scene.ambientColor = new Color3(0.5, 1, 1);
 const myMaterial = new StandardMaterial("myMaterial", scene);
 myMaterial.diffuseColor = new Color3(1, 0, 1);
 myMaterial.specularColor = new Color3(0.5, 0.6, 0.87);
-myMaterial.emissiveColor = new Color3(1, 1, 1);
+myMaterial.emissiveColor = new Color3(1, 0.4, 0.5);
 myMaterial.ambientColor = new Color3(0.23, 0.98, 0.53);
+myMaterial.ambientTexture = new Texture("./../meshes01/assets/textures/grass.jpg", scene);
 return myMaterial;
 }
 
@@ -217,5 +235,6 @@ export default function createStartScene(engine: Engine) {
   that.ground = createGround(that.scene);
   that.camera = createArcRotateCamera(that.scene);
   createPointShadows(that.point, that.box, that.sphere,);
+  createDirectionalShadows(that.dlight, that.box, that.sphere,);
   return that;
 }
