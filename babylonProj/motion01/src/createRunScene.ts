@@ -1,4 +1,4 @@
-import { AbstractMesh, ActionManager, CubeTexture } from "@babylonjs/core";
+import { AbstractMesh, ActionManager, CubeTexture, Mesh, _ENVTextureLoader } from "@babylonjs/core";
 import { SceneData } from "./interfaces";
 import {
   keyActionManager,
@@ -6,12 +6,14 @@ import {
   keyDownHeld,
   getKeyDown,
 } from "./keyActionManager";
+import { characterActionManager } from "./characterActionManager";
 
+import "@babylonjs/core/Materials/Textures/Loaders/envTextureLoader";
+import "@babylonjs/core/Helpers/sceneHelpers";
 export default function createRunScene(runScene: SceneData) {
   runScene.scene.actionManager = new ActionManager(runScene.scene);
   keyActionManager(runScene.scene);
 
-  
   const environmentTexture = new CubeTexture(
     "assets/textures/industrialSky.env",
     runScene.scene
@@ -22,8 +24,20 @@ export default function createRunScene(runScene: SceneData) {
     10000,
     0.1
   );
+  runScene.audio.stop();
+  runScene.scene.onBeforeRenderObservable.add(() => {
+    // check and respond to keypad presses
 
-      runScene.player.then((result) => {
+    if (getKeyDown() == 1 && (keyDownMap["m"] || keyDownMap["M"])) {
+      keyDownHeld();
+      if (runScene.audio.isPlaying) {
+        runScene.audio.stop();
+      } else {
+        runScene.audio.play();
+      }
+    }
+
+    runScene.player.then((result) => {
       let character: AbstractMesh = result!.meshes[0];
       if (keyDownMap["w"] || keyDownMap["ArrowUp"]) {
         character.position.x -= 0.1;
@@ -42,7 +56,14 @@ export default function createRunScene(runScene: SceneData) {
         character.rotation.y = (0 * Math.PI) / 2;
       }
     });
+  });
 
+// add incremental action to player
+  runScene.player.then((result) => {  
+    let characterMesh = result!.meshes[0];
+    characterActionManager(runScene.scene, characterMesh as Mesh);
+  });
 
   runScene.scene.onAfterRenderObservable.add(() => {});
+  
 }
