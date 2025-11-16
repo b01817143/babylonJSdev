@@ -9,8 +9,12 @@
     "preview": "vite preview --host",
     "motion01build": "tsc && vite build motion01",   
     "motion01preview": "vite preview motion01 --host",
-    "collision03build": "vite build collision03v2",
-    "collision03preview": "vite preview collision03v2 --host"
+    "motion03build": "tsc && vite build motion03",
+    "motion03preview": "vite preview motion03 --host",
+    "collision03build": "vite build collision03",
+    "collision03preview": "vite preview collision03 --host"
+
+
 
   },
   "devDependencies": {
