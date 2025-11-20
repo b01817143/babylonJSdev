@@ -1,4 +1,4 @@
-import { SceneData } from "./interfaces";
+import { SceneData } from "./interfaces ";
 
 import {
   Scene,
@@ -16,16 +16,14 @@ import {
   Vector4,
   InstancedMesh,
   SpriteManager,
-  Sprite
+  Sprite,
 } from "@babylonjs/core";
-
 
 function createTerrain(scene: Scene) {
   //Create large ground for valley environment
   const largeGroundMat = new StandardMaterial("largeGroundMat");
   largeGroundMat.diffuseTexture = new Texture(
-       "./assets/environments/valleygrass.png"
-     
+    "./assets/environments/valleygrass.png"
   );
 
   const largeGround = MeshBuilder.CreateGroundFromHeightMap(
@@ -61,19 +59,6 @@ function createGround(scene: Scene) {
   return ground;
 }
 
-function createHemisphericLight(scene: Scene) {
-  const light = new HemisphericLight(
-    "light",
-    new Vector3(2, 1, 0), // move x pos to direct shadows
-    scene
-  );
-  light.intensity = 0.8;
-  light.diffuse = new Color3(1, 1, 1);
-  light.specular = new Color3(1, 0.8, 0.8);
-  light.groundColor = new Color3(0, 0.2, 0.7);
-  return light;
-}
-
 function createSky(scene: Scene) {
   const skybox = MeshBuilder.CreateBox("skyBox", { size: 150 }, scene);
   const skyboxMaterial = new StandardMaterial("skyBox", scene);
@@ -82,13 +67,13 @@ function createSky(scene: Scene) {
     "./assets/textures/skybox/skybox",
     scene
   );
-  skyboxMaterial.reflectionTexture.coordinatesMode =
-    Texture.SKYBOX_MODE;
+  skyboxMaterial.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
   skyboxMaterial.diffuseColor = new Color3(0, 0, 0);
   skyboxMaterial.specularColor = new Color3(0, 0, 0);
   skybox.material = skyboxMaterial;
   return skybox;
 }
+
 function createBox(style: number) {
   //style 1 small style 2 semi detatched
   const boxMat = new StandardMaterial("boxMat");
@@ -110,7 +95,7 @@ function createBox(style: number) {
     // faceUV[4] would be for bottom but not used
     // faceUV[5] would be for top but not used
   }
-  
+
   const box = MeshBuilder.CreateBox("box", {
     width: style,
     height: 1,
@@ -213,7 +198,6 @@ function createHouses(scene: Scene, style: number) {
   // nothing returned by this function
 }
 
-
 function createTrees(scene: Scene) {
   const spriteManagerTrees = new SpriteManager(
     "treesManager",
@@ -240,6 +224,18 @@ function createTrees(scene: Scene) {
   // nothing returned by this function
 }
 
+function createHemisphericLight(scene: Scene) {
+  const light = new HemisphericLight(
+    "light",
+    new Vector3(2, 1, 0), // move x pos to direct shadows
+    scene
+  );
+  light.intensity = 0.8;
+  light.diffuse = new Color3(1, 1, 1);
+  light.specular = new Color3(1, 0.8, 0.8);
+  light.groundColor = new Color3(0, 0.2, 0.7);
+  return light;
+}
 
 function createArcRotateCamera(scene: Scene) {
   let camAlpha = -Math.PI / 2,
@@ -266,23 +262,21 @@ function createArcRotateCamera(scene: Scene) {
 }
 
 export default function createStartScene(engine: Engine) {
-  const scene   = new Scene(engine);
-  const ground  = createGround(scene);
-  const sky     = createSky(scene);
-  const lightHemispheric = createHemisphericLight(scene); // playing in the lift
+  let scene = new Scene(engine);
+  let ground = createGround(scene);
+  let sky = createSky(scene);
+  let lightHemispheric = createHemisphericLight(scene);
   createHouses(scene, 3);
-  // const roof = createRoof(scene);
+  createTrees(scene);
   createTerrain(scene);
-    createTrees(scene);
-  let camera  = createArcRotateCamera(scene);
+  let camera = createArcRotateCamera(scene);
 
-
-let that: SceneData = {
+  let that: SceneData = {
     scene,
     ground,
     sky,
     lightHemispheric,
-    camera
+    camera,
   };
   return that;
 }
