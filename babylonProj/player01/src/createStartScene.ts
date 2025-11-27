@@ -11,6 +11,10 @@ import {
   Mesh,
   Camera,
   Engine,
+  Texture,
+  StandardMaterial,
+  CubeTexture,
+  Color3,
 } from "@babylonjs/core";
 import { taaPixelShader } from "@babylonjs/core/Shaders/taa.fragment";
 
@@ -20,13 +24,68 @@ function createLight(scene: Scene) {
   return light;
 }
 
+export function createTerrain(scene: Scene) {
+  const largeGroundMat = new StandardMaterial("largeGroundMat", scene);
+  largeGroundMat.diffuseTexture = new Texture(
+    "./assets/environments/valleygrass.png",
+    scene
+  );
+
+  const largeGround = MeshBuilder.CreateGroundFromHeightMap(
+    "largeGround",
+    "./assets/environments/villageheightmap.png",
+    {
+      width: 150,
+      height: 150,
+      subdivisions: 20,
+      minHeight: 0,
+      maxHeight: 10,
+    },
+    scene
+  );
+
+  largeGround.material = largeGroundMat;
+  largeGround.position.y = -0.01;
+
+  return largeGround;
+}
+
 function createGround(scene: Scene) {
-  let ground = MeshBuilder.CreateGround(
+  const groundMaterial = new StandardMaterial("groundMaterial");
+  groundMaterial.diffuseTexture = new Texture(
+    "./assets/environments/playergrass.png"
+  );
+  groundMaterial.diffuseTexture.hasAlpha = true;
+  groundMaterial.backFaceCulling = false;
+  const ground = MeshBuilder.CreateGround(
     "ground",
     { width: 16, height: 16 },
     scene
   );
+  ground.material = groundMaterial;
+  ground.position.y = 0.01;
   return ground;
+}
+
+
+export function createSky(scene: Scene): Mesh {
+  const skybox = MeshBuilder.CreateBox("skyBox", { size: 150 }, scene);
+
+  const skyboxMaterial = new StandardMaterial("skyBox", scene);
+  skyboxMaterial.backFaceCulling = false;
+
+  skyboxMaterial.reflectionTexture = new CubeTexture(
+    "./assets/textures/skybox/skybox",
+    scene
+  );
+  skyboxMaterial.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
+
+  skyboxMaterial.diffuseColor = new Color3(0, 0, 0);
+  skyboxMaterial.specularColor = new Color3(0, 0, 0);
+
+  skybox.material = skyboxMaterial;
+
+  return skybox;
 }
 
 function createArcRotateCamera(scene: Scene) {
@@ -106,14 +165,17 @@ export default function createStartScene(engine: Engine) {
     scene: Scene;
     light?: HemisphericLight;
     ground?: Mesh;
-    camera?: Camera;
+    camera?: Camera; 
+    skybox?: Mesh;
+   
   }
 
   let that: SceneData = { scene: new Scene(engine) };
   //that.scene.debugLayer.show();
-
+  that.skybox = createSky(that.scene);
   that.light = createLight(that.scene);
   that.ground = createGround(that.scene);
+  createTerrain(that.scene);
   that.camera = createArcRotateCamera(that.scene);
   const assetsManager = addAssets(that.scene);
   assetsManager.load();
