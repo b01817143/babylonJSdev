@@ -221,6 +221,17 @@ function createTrees(scene: Scene) {
     tree.position.z = Math.random() * -35 + 8;
     tree.position.y = 0.2;
   }
+
+  // Third batch of trees in a new area
+for (let i = 0; i < 300; i++) {
+    const tree = new Sprite("tree", spriteManagerTrees);
+    tree.position.x = Math.random() * 20 - 10; // from -10 to 10
+    tree.position.z = Math.random() * 30 - 15; // from -15 to 15
+    tree.position.y = 0.2;
+}
+
+
+  
   // nothing returned by this function
 }
 

@@ -129,14 +129,25 @@ export function createSky(scene: Scene): Mesh {
 // ----------------------------------------------------
 
 function createArcRotateCamera(scene: Scene) {
+  let camAlpha = -Math.PI / 2,
+    camBeta = Math.PI / 2.5,
+    camDist = 25,
+    camTarget = new Vector3(0, 0, 0);
   let camera = new ArcRotateCamera(
     "camera1",
-    -Math.PI / 2,
-    Math.PI / 2.5,
-    10,
-    new Vector3(0, 0, 0),
+    camAlpha,
+    camBeta,
+    camDist,
+    camTarget,
     scene
   );
+  camera.lowerRadiusLimit = 9;
+  camera.upperRadiusLimit = 25;
+  camera.lowerAlphaLimit = 0;
+  camera.upperAlphaLimit = Math.PI * 2;
+  camera.lowerBetaLimit = 0;
+  camera.upperBetaLimit = Math.PI / 2.02;
+
   camera.attachControl(true);
   return camera;
 }
