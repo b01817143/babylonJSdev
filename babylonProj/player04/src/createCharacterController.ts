@@ -40,7 +40,7 @@ export function createCharacterController(scene: Scene) {
   
   // Apply material for visibility
   const capsuleMat = new StandardMaterial("capsuleMat", scene);
-  capsuleMat.diffuseColor = new Color3(0.8, 0.2, 0.2);
+  capsuleMat.diffuseColor = new Color3(0.1, 0.7, 0.4);
   capsuleMat.emissiveColor = new Color3(0.3, 0.1, 0.1);
   displayCapsule.material = capsuleMat;
   
