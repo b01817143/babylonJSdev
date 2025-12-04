@@ -1,5 +1,4 @@
-import "@babylonjs/loaders/glTF/2.0";
-
+import "@babylonjs/loaders/glTF/2.0";import "@babylonjs/loaders";
 import {
   Scene,
   Vector3,

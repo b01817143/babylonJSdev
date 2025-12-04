@@ -1,8 +1,7 @@
 import { SceneData } from "./interfaces";
 import HavokPhysics, { HavokPhysicsWithBindings } from "@babylonjs/havok";
 import { AbstractMesh, HavokPlugin, ISceneLoaderAsyncResult, PhysicsAggregate, PhysicsShapeType, Vector3 } from "@babylonjs/core";
-import "@babylonjs/loaders";
-
+import "@babylonjs/loaders/glTF/2.0";import "@babylonjs/loaders";
 // https://doc.babylonjs.com/typedoc/classes/BABYLON.HavokPlugin
 let initializedHavok: any;
 
