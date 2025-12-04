@@ -6,7 +6,6 @@ import {
   Scene,
   ArcRotateCamera,
   AssetsManager,
-  Vector2,
   Vector3,
   HemisphericLight,
   MeshBuilder,
@@ -22,14 +21,13 @@ import {
   CubeTexture
 } from "@babylonjs/core";
 
-import { WaterMaterial } from "@babylonjs/materials";
-
 // ----------------------------------------------------
 // TYPES
 // ----------------------------------------------------
 
 // Mesh with an optional physics aggregate attached
 export type PhysicsMesh = Mesh & { physicsAggregate?: PhysicsAggregate };
+
 
 // ----------------------------------------------------
 // LIGHT
@@ -40,6 +38,39 @@ function createLight(scene: Scene) {
   light.intensity = 0.7;
   return light;
 }
+
+
+// ----------------------------------------------------
+// TERRAIN
+// ----------------------------------------------------
+
+export function createTerrain(scene: Scene) {
+  const largeGroundMat = new StandardMaterial("largeGroundMat", scene);
+  largeGroundMat.diffuseTexture = new Texture(
+    "./assets/textures/waterbump.png",
+    scene
+  );
+
+  const largeGround = MeshBuilder.CreateGroundFromHeightMap(
+    "largeGround",
+    "./assets/textures/waterbump.png",
+    {
+      width: 150,
+      height: 150,
+      subdivisions: 20,
+      minHeight: 0,
+      maxHeight: 0,
+    },
+    scene
+  );
+
+  largeGround.material = largeGroundMat;
+  largeGround.position.y = -1.50;
+  
+
+  return largeGround;
+}
+
 
 // ----------------------------------------------------
 // GROUND (mesh + physics)
@@ -63,31 +94,9 @@ function createGround(scene: Scene): PhysicsMesh {
     scene
   );
 
-  (ground as PhysicsMesh).physicsAggregate = agg;
+ (ground as PhysicsMesh).physicsAggregate = agg;
 
   return ground as PhysicsMesh;
-}
-
-// ----------------------------------------------------
-// WATER
-// ----------------------------------------------------
-
-function createWater(scene: Scene) {
-const waterMesh = MeshBuilder.CreateGround("waterMesh", { width: 150, height: 150, subdivisions: 32 }, scene);
-
-  const waterMaterial = new WaterMaterial("waterMaterial", scene, new Vector2(512, 512));
-  waterMaterial.bumpTexture = new Texture("./assets/environments/waterbump.png", scene);
-  waterMaterial.windForce = 5;
-  waterMaterial.waveHeight = 0.5;
-  waterMaterial.windDirection = new Vector2(1, 1); // X and Z direction
-  waterMaterial.waterColor = new Color3(0, 0.3, 0.5);
-  waterMaterial.colorBlendFactor = 0.3;
-  waterMaterial.backFaceCulling = true;
-
-  waterMesh.material = waterMaterial;
-  waterMesh.position.y = 0.1; // Adjust this value to taste
-
-  return waterMesh;
 }
 
 
@@ -114,6 +123,7 @@ export function createSky(scene: Scene): Mesh {
 
   return skybox;
 }
+
 
 // ----------------------------------------------------
 // CAMERA
@@ -143,15 +153,70 @@ function createArcRotateCamera(scene: Scene) {
   return camera;
 }
 
+
 // ----------------------------------------------------
 // BOXES WITH PHYSICS
 // ----------------------------------------------------
 
-function createBox(scene: Scene, name: string, pos: Vector3) {
-  let box = MeshBuilder.CreateBox(name, { width: 1, height: 1 }, scene);
-  box.position.copyFrom(pos);
+function createBox1(scene: Scene) {
+  let box = MeshBuilder.CreateBox("box1", { width: 1, height: 1 }, scene);
+  box.position.set(-1, 3, 1);
 
-  const texture = new StandardMaterial(name + "_mat", scene);
+  const texture = new StandardMaterial("reflective1", scene);
+  texture.ambientTexture = new Texture("./assets/textures/wood.jpg", scene);
+  box.material = texture;
+
+  let boxAgg = new PhysicsAggregate(
+    box, PhysicsShapeType.BOX,
+    { mass: 0.2, restitution: 0.1, friction: 0.4 },
+    scene
+  );
+
+  boxAgg.body.setCollisionCallbackEnabled(true);
+  return boxAgg;
+}
+
+function createBox2(scene: Scene) {
+  let box = MeshBuilder.CreateBox("box2", { width: 1, height: 1 }, scene);
+  box.position.set(-0.7, 5, 1);
+
+  const texture = new StandardMaterial("reflective2", scene);
+  texture.ambientTexture = new Texture("./assets/textures/wood.jpg", scene);
+  box.material = texture;
+
+  let boxAgg = new PhysicsAggregate(
+    box, PhysicsShapeType.BOX,
+    { mass: 0.2, restitution: 0.1, friction: 0.4 },
+    scene
+  );
+
+  boxAgg.body.setCollisionCallbackEnabled(true);
+  return boxAgg;
+}
+
+function createBox3(scene: Scene) {
+  let box = MeshBuilder.CreateBox("box3", { width: 1, height: 1 }, scene);
+  box.position.set(-0.7, 5, 1);
+
+  const texture = new StandardMaterial("reflective3", scene);
+  texture.ambientTexture = new Texture("./assets/textures/wood.jpg", scene);
+  box.material = texture;
+
+  let boxAgg = new PhysicsAggregate(
+    box, PhysicsShapeType.BOX,
+    { mass: 0.2, restitution: 0.1, friction: 0.4 },
+    scene
+  );
+
+  boxAgg.body.setCollisionCallbackEnabled(true);
+  return boxAgg;
+}
+
+function createBox4(scene: Scene) {
+  let box = MeshBuilder.CreateBox("box4", { width: 1, height: 1 }, scene);
+  box.position.set(-0.7, 5, 1);
+
+  const texture = new StandardMaterial("reflective4", scene);
   texture.ambientTexture = new Texture("./assets/textures/wood.jpg", scene);
   box.material = texture;
 
@@ -172,26 +237,109 @@ function createBox(scene: Scene, name: string, pos: Vector3) {
 function addAssets(scene: Scene) {
   const assetsManager = new AssetsManager(scene);
 
-  const treeFiles = [
-    { name: "tree1", file: "CommonTree_1.gltf", pos: new Vector3(3, 0, 2), clonePos: new Vector3(0, 0, 5) },
-    { name: "tree2", file: "CommonTree_2.gltf", pos: new Vector3(0, 0, 2), clonePos: new Vector3(-3, 0, 5) },
-    { name: "tree3", file: "CommonTree_3.gltf", pos: new Vector3(-3, 0, 2), clonePos: new Vector3(3, 0, 5) },
-    { name: "tree4", file: "CommonTree_1.gltf", pos: new Vector3(3, 0, -2), clonePos: new Vector3(0, 0, -5) },
-    { name: "tree5", file: "CommonTree_2.gltf", pos: new Vector3(0, 0, -2), clonePos: new Vector3(-3, 0, -5) },
-    { name: "tree6", file: "CommonTree_3.gltf", pos: new Vector3(-3, 0, -2), clonePos: new Vector3(3, 0, -5) },
-  ];
+  // Tree 1
+const tree1 = assetsManager.addMeshTask(
+  "tree1 task",
+  "",
+  "./assets/nature/gltf/",
+  "CommonTree_1.gltf"
+);
 
-  for (const t of treeFiles) {
-    const task = assetsManager.addMeshTask(t.name + " task", "", "./assets/nature/gltf/", t.file);
-    task.onSuccess = function (task) {
-      const root = task.loadedMeshes[0];
-      root.position = t.pos;
-      root.scaling = new Vector3(0.5, 0.5, 0.5);
-      task.loadedMeshes.forEach(mesh => (mesh.isVisible = true));
-      const clone = root.clone(t.name + "_clone", null, true);
-      clone!.position = t.clonePos;
-    };
-  }
+tree1.onSuccess = function (task) {
+  const root = task.loadedMeshes[0];
+  root.position = new Vector3(3, 0, 2);
+  root.scaling = new Vector3(0.5, 0.5, 0.5);
+  task.loadedMeshes.forEach(mesh => (mesh.isVisible = true));
+
+  const clone = root.clone("tree1_clone", null, true);
+  clone!.position = new Vector3(0, 0, 5);
+};
+
+// Tree 2
+const tree2 = assetsManager.addMeshTask(
+  "tree2 task",
+  "",
+  "./assets/nature/gltf/",
+  "CommonTree_2.gltf"
+);
+
+tree2.onSuccess = function (task) {
+  const root = task.loadedMeshes[0];
+  root.position = new Vector3(0, 0, 2);
+  root.scaling = new Vector3(0.5, 0.5, 0.5);
+
+  const clone = root.clone("tree2_clone", null, true);
+  clone!.position = new Vector3(-3, 0, 5);
+};
+
+// Tree 3
+const tree3 = assetsManager.addMeshTask(
+  "tree3 task",
+  "",
+  "./assets/nature/gltf/",
+  "CommonTree_3.gltf"
+);
+
+tree3.onSuccess = function (task) {
+  const root = task.loadedMeshes[0];
+  root.position = new Vector3(-3, 0, 2);
+  root.scaling = new Vector3(0.5, 0.5, 0.5);
+
+  const clone = root.clone("tree3_clone", null, true);
+  clone!.position = new Vector3(3, 0, 5);
+};
+
+// Tree 4
+const tree4 = assetsManager.addMeshTask(
+  "tree4 task",
+  "",
+  "./assets/nature/gltf/",
+  "CommonTree_1.gltf"
+);
+
+tree4.onSuccess = function (task) {
+  const root = task.loadedMeshes[0];
+  root.position = new Vector3(3, 0, -2);
+  root.scaling = new Vector3(0.5, 0.5, 0.5);
+
+  const clone = root.clone("tree4_clone", null, true);
+  clone!.position = new Vector3(0, 0, -5);
+};
+
+// Tree 5
+const tree5 = assetsManager.addMeshTask(
+  "tree5 task",
+  "",
+  "./assets/nature/gltf/",
+  "CommonTree_2.gltf"
+);
+
+tree5.onSuccess = function (task) {
+  const root = task.loadedMeshes[0];
+  root.position = new Vector3(0, 0, -2);
+  root.scaling = new Vector3(0.5, 0.5, 0.5);
+
+  const clone = root.clone("tree5_clone", null, true);
+  clone!.position = new Vector3(-3, 0, -5);
+};
+
+// Tree 6
+const tree6 = assetsManager.addMeshTask(
+  "tree6 task",
+  "",
+  "./assets/nature/gltf/",
+  "CommonTree_3.gltf"
+);
+
+tree6.onSuccess = function (task) {
+  const root = task.loadedMeshes[0];
+  root.position = new Vector3(-3, 0, -2);
+  root.scaling = new Vector3(0.5, 0.5, 0.5);
+
+  const clone = root.clone("tree6_clone", null, true);
+  clone!.position = new Vector3(3, 0, -5);
+};
+
 
   assetsManager.onTaskErrorObservable.add(task =>
     console.log("task failed", task.errorObject.message)
@@ -199,6 +347,7 @@ function addAssets(scene: Scene) {
 
   return assetsManager;
 }
+
 
 // ----------------------------------------------------
 // MAIN SCENE CREATION
@@ -228,13 +377,13 @@ export default async function createStartScene(engine: Engine) {
   // Scene setup
   that.skybox = createSky(that.scene);
   that.light = createLight(that.scene);
-  that.ground = createGround(that.scene); // Sand ground
-  createWater(that.scene); // Water plane
+  that.ground = createGround(that.scene);
+  createTerrain(that.scene);
   that.camera = createArcRotateCamera(that.scene);
-  that.box1 = createBox(that.scene, "box1", new Vector3(-1, 3, 1));
-  that.box2 = createBox(that.scene, "box2", new Vector3(-0.7, 5, 1));
-  that.box3 = createBox(that.scene, "box3", new Vector3(-0.7, 5, 1));
-  that.box4 = createBox(that.scene, "box4", new Vector3(-0.7, 5, 1));
+  that.box1 = createBox1(that.scene);
+  that.box2 = createBox2(that.scene);
+   that.box3 = createBox3(that.scene);
+  that.box4 = createBox4(that.scene);
 
   const assetsManager = addAssets(that.scene);
   assetsManager.load();

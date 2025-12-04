@@ -25,6 +25,14 @@ function createTerrain(scene: Scene) {
   largeGroundMat.diffuseTexture = new Texture(
     "./assets/environments/valleygrass.png"
   );
+  
+    function createLight(scene: Scene) {
+      const light = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
+      light.intensity = 0.7;
+      return light;
+    }
+
+  
 
   const largeGround = MeshBuilder.CreateGroundFromHeightMap(
     "largeGround",
@@ -217,11 +225,27 @@ function createTrees(scene: Scene) {
 
   for (let i = 0; i < 500; i++) {
     const tree = new Sprite("tree", spriteManagerTrees);
-    tree.position.x = Math.random() * 25 + 7;
-    tree.position.z = Math.random() * -35 + 8;
+    tree.position.x = Math.random() * 30;
+    tree.position.z = Math.random() * 20 + 8;
     tree.position.y = 0.2;
   }
 
+   for (let i = 0; i < 500; i++) {
+    const tree = new Sprite("tree", spriteManagerTrees);
+    tree.position.x = Math.random() * -30;
+    tree.position.z = Math.random() * -50 + -3;
+    tree.position.y = 0.2;
+  }
+    
+    for (let i = 0; i < 500; i++) {
+    const tree = new Sprite("tree", spriteManagerTrees);
+    tree.position.x = Math.random() * 90;
+    tree.position.z = Math.random() * -25 + 5;
+    tree.position.y = 0.2;
+  }
+    
+
+  /*
   // Third batch of trees in a new area
 for (let i = 0; i < 300; i++) {
     const tree = new Sprite("tree", spriteManagerTrees);
@@ -229,7 +253,7 @@ for (let i = 0; i < 300; i++) {
     tree.position.z = Math.random() * 30 - 15; // from -15 to 15
     tree.position.y = 0.2;
 }
-
+*/
 
   
   // nothing returned by this function
@@ -241,7 +265,7 @@ function createHemisphericLight(scene: Scene) {
     new Vector3(2, 1, 0), // move x pos to direct shadows
     scene
   );
-  light.intensity = 0.8;
+  light.intensity = 50.8;
   light.diffuse = new Color3(1, 1, 1);
   light.specular = new Color3(1, 0.8, 0.8);
   light.groundColor = new Color3(0, 0.2, 0.7);
